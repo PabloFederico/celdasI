@@ -4,8 +4,8 @@ import java.util.List;
 
 import ab.demo.ClientNaiveAgent;
 import ab.vision.ABObject;
-import ab.vision.Vision;
 import ab.vision.GameStateExtractor.GameState;
+import ab.vision.Vision;
 
 public class State {
 
