@@ -1,1 +1,1 @@
- 
+java -jar ABSoftware.jar -nasc

@@ -17,6 +17,8 @@ import java.util.Random;
 
 import ab.demo.other.ClientActionRobot;
 import ab.demo.other.ClientActionRobotJava;
+import ab.demo.solver.DefaultSolver;
+import ab.demo.solver.Solver;
 import ab.planner.TrajectoryPlanner;
 import ab.vision.ABObject;
 import ab.vision.GameStateExtractor.GameState;
@@ -27,15 +29,15 @@ public class ClientNaiveAgent implements Runnable {
 
 
 	//Wrapper of the communicating messages
-	private ClientActionRobotJava ar;
+	public ClientActionRobotJava ar;
 	public byte currentLevel = -1;
 	public int failedCounter = 0;
 	public int[] solved;
-	TrajectoryPlanner tp; 
-	private int id = 28888;
-	private boolean firstShot;
-	private Point prevTarget;
-	private Random randomGenerator;
+	public TrajectoryPlanner tp; 
+	public int id = 28888;
+	public boolean firstShot;
+	public Point prevTarget;
+	public Random randomGenerator;
 	/**
 	 * Constructor using the default IP
 	 * */
@@ -195,157 +197,11 @@ public class ClientNaiveAgent implements Runnable {
 	public GameState solve()
 
 	{
-
-		// capture Image
-		BufferedImage screenshot = ar.doScreenShot();
-
-		// process image
-		Vision vision = new Vision(screenshot);
-		
-		Rectangle sling = vision.findSlingshotMBR();
-
-		//If the level is loaded (in PLAYING　state)but no slingshot detected, then the agent will request to fully zoom out.
-		while (sling == null && ar.checkState() == GameState.PLAYING) {
-			System.out.println("no slingshot detected. Please remove pop up or zoom out");
-			
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				
-				e.printStackTrace();
-			}
-			ar.fullyZoomOut();
-			screenshot = ar.doScreenShot();
-			vision = new Vision(screenshot);
-			sling = vision.findSlingshotMBR();
-		}
-
-		
-		 // get all the pigs
- 		List<ABObject> pigs = vision.findPigsMBR();
- 		
-		GameState state = ar.checkState();
-		// if there is a sling, then play, otherwise skip.
-		if (sling != null) {
-			
-			
-			//If there are pigs, we pick up a pig randomly and shoot it. 
-			if (!pigs.isEmpty()) {		
-				Point releasePoint = null;
-				// random pick up a pig
-					ABObject pig = pigs.get(randomGenerator.nextInt(pigs.size()));
-					
-					Point _tpt = pig.getCenter();
-
-					
-					// if the target is very close to before, randomly choose a
-					// point near it
-					if (prevTarget != null && distance(prevTarget, _tpt) < 10) {
-						double _angle = randomGenerator.nextDouble() * Math.PI * 2;
-						_tpt.x = _tpt.x + (int) (Math.cos(_angle) * 10);
-						_tpt.y = _tpt.y + (int) (Math.sin(_angle) * 10);
-						System.out.println("Randomly changing to " + _tpt);
-					}
-
-					prevTarget = new Point(_tpt.x, _tpt.y);
-
-					// estimate the trajectory
-					ArrayList<Point> pts = tp.estimateLaunchPoint(sling, _tpt);
-
-					// do a high shot when entering a level to find an accurate velocity
-					if (firstShot && pts.size() > 1) {
-						releasePoint = pts.get(1);
-					} else 
-						if (pts.size() == 1)
-							releasePoint = pts.get(0);
-						else 
-							if(pts.size() == 2)
-							{
-								// System.out.println("first shot " + firstShot);
-								// randomly choose between the trajectories, with a 1 in
-								// 6 chance of choosing the high one
-								if (randomGenerator.nextInt(6) == 0)
-									releasePoint = pts.get(1);
-								else
-								releasePoint = pts.get(0);
-							}
-							Point refPoint = tp.getReferencePoint(sling);
-
-					// Get the release point from the trajectory prediction module
-					int tapTime = 0;
-					if (releasePoint != null) {
-						double releaseAngle = tp.getReleaseAngle(sling,
-								releasePoint);
-						System.out.println("Release Point: " + releasePoint);
-						System.out.println("Release Angle: "
-								+ Math.toDegrees(releaseAngle));
-						int tapInterval = 0;
-						switch (ar.getBirdTypeOnSling()) 
-						{
-
-							case RedBird:
-								tapInterval = 0; break;               // start of trajectory
-							case YellowBird:
-								tapInterval = 65 + randomGenerator.nextInt(25);break; // 65-90% of the way
-							case WhiteBird:
-								tapInterval =  50 + randomGenerator.nextInt(20);break; // 50-70% of the way
-							case BlackBird:
-								tapInterval =  0;break; // 70-90% of the way
-							case BlueBird:
-								tapInterval =  65 + randomGenerator.nextInt(20);break; // 65-85% of the way
-							default:
-								tapInterval =  60;
-						}
-						
-						tapTime = tp.getTapTime(sling, releasePoint, _tpt, tapInterval);
-						
-					} else
-						{
-							System.err.println("No Release Point Found");
-							return ar.checkState();
-						}
-				
-				
-					// check whether the slingshot is changed. the change of the slingshot indicates a change in the scale.
-					ar.fullyZoomOut();
-					screenshot = ar.doScreenShot();
-					vision = new Vision(screenshot);
-					Rectangle _sling = vision.findSlingshotMBR();
-					if(_sling != null)
-					{
-						double scale_diff = Math.pow((sling.width - _sling.width),2) +  Math.pow((sling.height - _sling.height),2);
-						if(scale_diff < 25)
-						{
-							int dx = (int) releasePoint.getX() - refPoint.x;
-							int dy = (int) releasePoint.getY() - refPoint.y;
-							if(dx < 0)
-							{
-								long timer = System.currentTimeMillis();
-								ar.shoot(refPoint.x, refPoint.y, dx, dy, 0, tapTime, false);
-								System.out.println("It takes " + (System.currentTimeMillis() - timer) + " ms to take a shot");
-								state = ar.checkState();
-								if ( state == GameState.PLAYING )
-								{
-									screenshot = ar.doScreenShot();
-									vision = new Vision(screenshot);
-									List<Point> traj = vision.findTrajPoints();
-									tp.adjustTrajectory(traj, sling, releasePoint);
-									firstShot = false;
-								}
-							}
-						}
-						else
-							System.out.println("Scale is changed, can not execute the shot, will re-segement the image");
-					}
-					else
-						System.out.println("no sling detected, can not execute the shot, will re-segement the image");
-				
-			}
-		}
-		return state;
+		Solver solver = new DefaultSolver();
+		return solver.solve(this);
 	}
 
-	private double distance(Point p1, Point p2) {
+	public double distance(Point p1, Point p2) {
 		return Math.sqrt((double) ((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y)* (p1.y - p2.y)));
 	}
 
