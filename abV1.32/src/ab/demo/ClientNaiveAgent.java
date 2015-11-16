@@ -17,7 +17,7 @@ import java.util.Random;
 
 import ab.demo.other.ClientActionRobot;
 import ab.demo.other.ClientActionRobotJava;
-import ab.demo.solver.DefaultSolver;
+import ab.demo.solver.AutonomousSolver;
 import ab.demo.solver.Solver;
 import ab.planner.TrajectoryPlanner;
 import ab.vision.ABObject;
@@ -197,7 +197,8 @@ public class ClientNaiveAgent implements Runnable {
 	public GameState solve()
 
 	{
-		Solver solver = new DefaultSolver();
+		//Solver solver = new DefaultSolver();
+		Solver solver = new AutonomousSolver();
 		return solver.solve(this);
 	}
 
