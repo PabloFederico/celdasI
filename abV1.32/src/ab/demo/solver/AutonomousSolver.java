@@ -45,6 +45,7 @@ public class AutonomousSolver extends Solver{
 					teory.incrementSucces();
 					teory.incUses();
 					this.teories.add(teory);
+					teory.use();
 				}
 			}			 
 			
