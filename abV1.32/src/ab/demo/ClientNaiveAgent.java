@@ -38,6 +38,8 @@ public class ClientNaiveAgent implements Runnable {
 	public boolean firstShot;
 	public Point prevTarget;
 	public Random randomGenerator;
+
+	private Solver solver = new AutonomousSolver();
 	/**
 	 * Constructor using the default IP
 	 * */
@@ -198,7 +200,7 @@ public class ClientNaiveAgent implements Runnable {
 
 	{
 		//Solver solver = new DefaultSolver();
-		Solver solver = new AutonomousSolver();
+		//Solver solver = new AutonomousSolver();
 		return solver.solve(this);
 	}
 
