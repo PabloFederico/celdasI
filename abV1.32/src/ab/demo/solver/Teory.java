@@ -8,6 +8,7 @@ import java.util.Set;
 public class Teory {
 
 	private State beginState;
+	private State endState;
 	private Action action;
 	private int successNumber;
 	private int useNumber;

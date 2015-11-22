@@ -14,7 +14,7 @@ import ab.vision.GameStateExtractor.GameState;
 public class Action {
 	private Point target;
 	private ArrayList<Point> trajectory;
-	private int tapTime;
+	private int tapTime; //[1 - (0, 60 %) ]
 	
 	public Point getTarget() {
 		return target;
@@ -45,10 +45,14 @@ public class Action {
 		List<ABObject> pigs = state.getPigs();
 		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		Rectangle sling = state.getVision().findSlingshotMBR();
+		ABObject pig = null;
 		
 		Point releasePoint = null;
-		// random pick up a pig
-		ABObject pig = pigs.get(clientNaiveAgent.randomGenerator.nextInt(pigs.size()));
+		if (pigs.isEmpty()) {
+			return clientNaiveAgent.ar.checkState();
+		}
+		pig = pigs.get(clientNaiveAgent.randomGenerator.nextInt(pigs.size()));
+		
 		
 		Point _tpt = pig.getCenter();
 

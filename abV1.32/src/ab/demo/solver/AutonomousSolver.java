@@ -37,6 +37,7 @@ public class AutonomousSolver extends Solver{
 					t.incrementSucces();
 					t.incUses();	
 					t.use();
+					System.out.println("Loop");
 				}
 			}else{ 
 				
@@ -53,7 +54,7 @@ public class AutonomousSolver extends Solver{
 			e.printStackTrace();
 		}
 		
-		return null; 
+		return clientNaiveAgent.ar.checkState(); 
 		
 	}
 
