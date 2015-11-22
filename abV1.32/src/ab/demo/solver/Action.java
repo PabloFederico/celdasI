@@ -15,6 +15,8 @@ public class Action {
 	private Point target;
 	private ArrayList<Point> trajectory;
 	private int tapTime; //[1 - (0, 60 %) ]
+	private Point releasePoint;
+	private Point refPoint;
 	
 	public Point getTarget() {
 		return target;
@@ -40,61 +42,13 @@ public class Action {
 		this.tapTime = tapTime;
 	} 
 	
-	public GameState getDefaultTarget(State state){
-		
-		List<ABObject> pigs = state.getPigs();
+	public void getDefaultTapTime(State state){
 		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		Rectangle sling = state.getVision().findSlingshotMBR();
-		ABObject pig = null;
 		
-		Point releasePoint = null;
-		if (pigs.isEmpty()) {
-			return clientNaiveAgent.ar.checkState();
-		}
-		pig = pigs.get(clientNaiveAgent.randomGenerator.nextInt(pigs.size()));
-		
-		
-		Point _tpt = pig.getCenter();
-
-		
-		// if the target is very close to before, randomly choose a
-		// point near it
-		if (clientNaiveAgent.prevTarget != null && clientNaiveAgent.distance(clientNaiveAgent.prevTarget, _tpt) < 10) {
-			double _angle = clientNaiveAgent.randomGenerator.nextDouble() * Math.PI * 2;
-			_tpt.x = _tpt.x + (int) (Math.cos(_angle) * 10);
-			_tpt.y = _tpt.y + (int) (Math.sin(_angle) * 10);
-			System.out.println("Randomly changing to " + _tpt);
-		}
-
-		clientNaiveAgent.prevTarget = new Point(_tpt.x, _tpt.y);
-		this.target = clientNaiveAgent.prevTarget;
-		
-		
-		// estimate the trajectory
-		ArrayList<Point> pts = clientNaiveAgent.tp.estimateLaunchPoint(sling, _tpt);
-		GameState gState = clientNaiveAgent.ar.checkState();
-		// do a high shot when entering a level to find an accurate velocity
-		if (clientNaiveAgent.firstShot && pts.size() > 1) {
-			releasePoint = pts.get(1);
-		} else 
-			if (pts.size() == 1)
-				releasePoint = pts.get(0);
-			else 
-				if(pts.size() == 2)
-				{
-					// System.out.println("first shot " + clientNaiveAgent.firstShot);
-					// randomly choose between the trajectories, with a 1 in
-					// 6 chance of choosing the high one
-					if (clientNaiveAgent.randomGenerator.nextInt(6) == 0)
-						releasePoint = pts.get(1);
-					else
-					releasePoint = pts.get(0);
-				}
-				Point refPoint = clientNaiveAgent.tp.getReferencePoint(sling);
-
 		// Get the release point from the trajectory prediction module
 		int tapTime = 0;
-		if (releasePoint != null) {
+		if (this.releasePoint != null) {
 			double releaseAngle = clientNaiveAgent.tp.getReleaseAngle(sling,
 					releasePoint);
 			System.out.println("Release Point: " + releasePoint);
@@ -118,27 +72,95 @@ public class Action {
 					tapInterval =  60;
 			}
 			
-			tapTime = clientNaiveAgent.tp.getTapTime(sling, releasePoint, _tpt, tapInterval);
+			tapTime = clientNaiveAgent.tp.getTapTime(sling, releasePoint, this.target, tapInterval);
 			
-		} else{
-			System.err.println("No Release Point Found");
-			return clientNaiveAgent.ar.checkState();
+		} 
+		this.tapTime = tapTime;
+		
+	}
+	public void getDefaultTrajectory(State state){
+		
+		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		Rectangle sling = state.getVision().findSlingshotMBR();
+		Point releasePoint = null;
+		
+		// estimate the trajectory
+		ArrayList<Point> pts = clientNaiveAgent.tp.estimateLaunchPoint(sling, this.target);
+		// do a high shot when entering a level to find an accurate velocity
+		if (clientNaiveAgent.firstShot && pts.size() > 1) {
+			releasePoint = pts.get(1);
+		} else 
+			if (pts.size() == 1){
+				releasePoint = pts.get(0);
+			}
+			else 
+				if(pts.size() == 2)
+				{
+					// System.out.println("first shot " + clientNaiveAgent.firstShot);
+					// randomly choose between the trajectories, with a 1 in
+					// 6 chance of choosing the high one
+					if (clientNaiveAgent.randomGenerator.nextInt(6) == 0)
+						releasePoint = pts.get(1);
+					else
+					releasePoint = pts.get(0);
+				}
+		this.refPoint  = clientNaiveAgent.tp.getReferencePoint(sling);
+		this.trajectory = pts;
+		this.releasePoint = releasePoint;
+	}
+	
+	public void getDefaultTarget(State state){
+		
+		List<ABObject> pigs = state.getPigs();
+		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		ABObject pig = null;
+		
+		if (pigs.isEmpty()) {
+			return;
 		}
+		pig = pigs.get(clientNaiveAgent.randomGenerator.nextInt(pigs.size()));
+		
+		Point _tpt = pig.getCenter();	
+		// if the target is very close to before, randomly choose a
+		// point near it
+		if (clientNaiveAgent.prevTarget != null && clientNaiveAgent.distance(clientNaiveAgent.prevTarget, _tpt) < 10) {
+			double _angle = clientNaiveAgent.randomGenerator.nextDouble() * Math.PI * 2;
+			_tpt.x = _tpt.x + (int) (Math.cos(_angle) * 10);
+			_tpt.y = _tpt.y + (int) (Math.sin(_angle) * 10);
+			System.out.println("Randomly changing to " + _tpt);
+		}
+
+		clientNaiveAgent.prevTarget = new Point(_tpt.x, _tpt.y);
+		this.target = clientNaiveAgent.prevTarget;
+	}
 	
-	
+	public GameState defaultAction(State state){
+		
+		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		Rectangle sling = state.getVision().findSlingshotMBR();
+		
 		// check whether the slingshot is changed. the change of the slingshot indicates a change in the scale.
 		clientNaiveAgent.ar.fullyZoomOut();
 		BufferedImage screenshot = clientNaiveAgent.ar.doScreenShot();
 		Vision vision = new Vision(screenshot);
-		
+		GameState gState = clientNaiveAgent.ar.checkState();
 		Rectangle _sling = vision.findSlingshotMBR();
+		
+		System.out.println("check release Points");
+		if( this.releasePoint == null){
+			System.err.println("No Release Point Found");
+			return clientNaiveAgent.ar.checkState();
+		}
 		if(_sling != null)
 		{
+			System.out.println("hay _sling");
 			double scale_diff = Math.pow((sling.width - _sling.width),2) +  Math.pow((sling.height - _sling.height),2);
 			if(scale_diff < 25)
 			{
+				System.out.println("dif scala");
 				int dx = (int) releasePoint.getX() - refPoint.x;
 				int dy = (int) releasePoint.getY() - refPoint.y;
+				System.out.println("dx dy");
 				if(dx < 0)
 				{
 					long timer = System.currentTimeMillis();
@@ -162,9 +184,12 @@ public class Action {
 		}
 		return gState;
 	}
-
+	
 	public GameState exec(State beginState) {
-		return getDefaultTarget(beginState);
+		getDefaultTarget(beginState);
+		getDefaultTrajectory(beginState);
+		getDefaultTapTime(beginState);
+		return this.defaultAction(beginState);
 		
 	}
 

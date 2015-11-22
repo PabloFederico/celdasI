@@ -14,11 +14,11 @@ public class AutonomousSolver extends Solver{
 	private Sensor sensor;
 	private State state;
 	private List<State> states = null;
-	public Set<Teory> teories = null;	
+	public Set<Theory> theories = null;	
 	
 	public AutonomousSolver(){
 		states = new ArrayList<State>();
-		this.teories = new HashSet<Teory>();	
+		this.theories = new HashSet<Theory>();	
 	}
 	@Override
 	public GameState solve(ClientNaiveAgent clientNaiveAgent) {
@@ -27,13 +27,13 @@ public class AutonomousSolver extends Solver{
 		try {
 			this.state 	= sensor.checkEnviroment();
 			this.states.add(state);
-			Teory teory = new Teory();
-			teory.addBeginState(state);
+			Theory theory = new Theory();
+			theory.addBeginState(state);
 			
-			List<Teory> teoriesEquals =  Teory.getEquals(teory, teories);
+			List<Theory> teoriesEquals =  Theory.getEquals(theory, theories);
 			if(!teoriesEquals.isEmpty()){
 				// Ponderacion de teorias
-				for (Teory t : teoriesEquals) { 
+				for (Theory t : teoriesEquals) { 
 					t.incrementSucces();
 					t.incUses();	
 					t.use();
@@ -42,14 +42,15 @@ public class AutonomousSolver extends Solver{
 			}else{ 
 				
 				//Ponderamos y agregamos la teoria local
-				if(!this.teories.contains(teory)){
-					teory.incrementSucces();
-					teory.incUses();
-					this.teories.add(teory);
-					teory.use();
+				if(!this.theories.contains(theory)){
+					theory.incrementSucces();
+					theory.incUses();
+					this.theories.add(theory);
+					theory.use();
 				}
 			}			 
-			
+			State endState = sensor.checkEnviroment();
+			theory.addEndState(endState);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
