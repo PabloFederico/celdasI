@@ -63,4 +63,15 @@ public class State {
 		return this.pigs.size() == other.getPigs().size();
 	}
 
+	public boolean isEqual(State beginState) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	//TODO:Needs to simplify because vision and pigs has a lot of complex classes
+	@Override
+	public String toString() {
+		return "State []";
+	}
+
 }

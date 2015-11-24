@@ -40,6 +40,11 @@ public class ClientNaiveAgent implements Runnable {
 	public Random randomGenerator;
 
 	private Solver solver = new AutonomousSolver();
+	
+	public Solver getSolver() {
+		return this.solver;
+	}
+	
 	/**
 	 * Constructor using the default IP
 	 * */
@@ -140,6 +145,7 @@ public class ClientNaiveAgent implements Runnable {
 				//display the global best scores
 				int[] scores = ar.checkScore();
 				System.out.println("Global best score: ");
+				//this.getSolver().save();
 				for (int i = 0; i < scores.length ; i ++)
 				{
 				

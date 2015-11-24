@@ -18,5 +18,7 @@ import ab.vision.Vision;
 public abstract class Solver{
 	
 	public abstract GameState solve(ClientNaiveAgent clientNaiveAgent);
+	
+	public abstract void save();
 
 }
