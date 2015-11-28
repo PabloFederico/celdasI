@@ -145,7 +145,7 @@ public class ClientNaiveAgent implements Runnable {
 				//display the global best scores
 				int[] scores = ar.checkScore();
 				System.out.println("Global best score: ");
-				//this.getSolver().save();
+				this.getSolver().save();
 				for (int i = 0; i < scores.length ; i ++)
 				{
 				

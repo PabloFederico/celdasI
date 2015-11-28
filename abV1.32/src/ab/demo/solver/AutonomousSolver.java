@@ -1,17 +1,27 @@
 package ab.demo.solver;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import ab.demo.ClientNaiveAgent;
 import ab.vision.GameStateExtractor.GameState;
+import flexjson.JSONSerializer;
 
 public class AutonomousSolver extends Solver{
 
@@ -63,20 +73,19 @@ public class AutonomousSolver extends Solver{
 	
 	@Override
 	public void save() {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		//Gson gson = new Gson();
-		for (Theory t:theories) {
-			System.out.println("Teoria Impresa");
-			String json = gson.toJson(t);
-			try {
-				FileWriter writer = new FileWriter("Theories.json");
-				writer.write(json);
-				writer.close();
-	
-			} catch (IOException e) {
-				e.printStackTrace();
+		try {
+			PrintWriter out = new PrintWriter("filename.json");
+			JSONSerializer serializer = new JSONSerializer();
+			String outS = "";
+			for (Theory t : theories) {
+				outS = serializer.include("action").serialize( t );
+				out.println(outS);
 			}
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
+        
 	}
 
 }

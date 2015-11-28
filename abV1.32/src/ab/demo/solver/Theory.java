@@ -6,9 +6,9 @@ import java.util.Set;
 
 public class Theory {
 	
-	private State beginState;
-	private State endState;
-	private Action action;
+	private transient State beginState;
+	private transient State endState;
+	private transient Action action;
 	private int successNumber;
 	private int useNumber;
 	
