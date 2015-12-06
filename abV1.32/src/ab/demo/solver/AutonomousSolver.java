@@ -21,6 +21,7 @@ import com.google.gson.GsonBuilder;
 
 import ab.demo.ClientNaiveAgent;
 import ab.vision.GameStateExtractor.GameState;
+import ab.vision.Vision;
 import flexjson.JSONSerializer;
 
 public class AutonomousSolver extends Solver{
@@ -37,8 +38,10 @@ public class AutonomousSolver extends Solver{
 	@Override
 	public GameState solve(ClientNaiveAgent clientNaiveAgent) {
 		this.sensor = new Sensor(clientNaiveAgent);
+		ClientNaiveAgent client = sensor.getClientNaiveAgent();
 		try {
 			this.state 	= sensor.checkEnviroment();
+			Vision vision = sensor.getVision();
 			this.states.add(state);
 			Theory theory = new Theory();
 			theory.addBeginState(state);
@@ -49,7 +52,7 @@ public class AutonomousSolver extends Solver{
 				for (Theory t : teoriesEquals) { 
 					t.incrementSucces();
 					t.incUses();	
-					t.use();
+					t.use(vision, client);
 				}
 			}else{ 
 				
@@ -58,7 +61,7 @@ public class AutonomousSolver extends Solver{
 					theory.incrementSucces();
 					theory.incUses();
 					this.theories.add(theory);
-					theory.use();
+					theory.use(vision, client);
 				}
 			}			 
 			State endState = sensor.checkEnviroment();
@@ -71,7 +74,7 @@ public class AutonomousSolver extends Solver{
 		
 	}
 	
-	@Override
+	/*@Override
 	public void save() {
 		try {
 			PrintWriter out = new PrintWriter("filename.json");
@@ -83,6 +86,29 @@ public class AutonomousSolver extends Solver{
 			}
 			out.close();
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+        
+	}*/
+	
+	@Override
+	public void save() {
+		try {
+			File out = new File("fileJ.json");
+			ObjectMapper mapper = new ObjectMapper();
+			for (Theory t : theories) {
+				mapper.writeValue(out, t);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         

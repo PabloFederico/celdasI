@@ -42,9 +42,9 @@ public class Action {
 		this.tapTime = tapTime;
 	} 
 	
-	public void getDefaultTapTime(State state){
-		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
-		Rectangle sling = state.getVision().findSlingshotMBR();
+	public void getDefaultTapTime(State state, Vision vision, ClientNaiveAgent clientNaiveAgent){
+		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		Rectangle sling = vision.findSlingshotMBR();//state.getVision().findSlingshotMBR();
 		
 		// Get the release point from the trajectory prediction module
 		int tapTime = 0;
@@ -78,10 +78,10 @@ public class Action {
 		this.tapTime = tapTime;
 		
 	}
-	public void getDefaultTrajectory(State state){
+	public void getDefaultTrajectory(State state, Vision vision, ClientNaiveAgent clientNaiveAgent){
 		
-		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
-		Rectangle sling = state.getVision().findSlingshotMBR();
+		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		Rectangle sling = vision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();
 		Point releasePoint = null;
 		
 		// estimate the trajectory
@@ -109,10 +109,10 @@ public class Action {
 		this.releasePoint = releasePoint;
 	}
 	
-	public void getDefaultTarget(State state){
+	public void getDefaultTarget(State state, Vision vision, ClientNaiveAgent clientNaiveAgent){
 		
 		List<ABObject> pigs = state.getPigs();
-		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		ABObject pig = null;
 		
 		if (pigs.isEmpty()) {
@@ -134,10 +134,10 @@ public class Action {
 		this.target = clientNaiveAgent.prevTarget;
 	}
 	
-	public GameState defaultAction(State state){
+	public GameState defaultAction(State state, Vision oldVision, ClientNaiveAgent clientNaiveAgent){
 		
-		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
-		Rectangle sling = state.getVision().findSlingshotMBR();
+		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		Rectangle sling = oldVision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();
 		
 		// check whether the slingshot is changed. the change of the slingshot indicates a change in the scale.
 		clientNaiveAgent.ar.fullyZoomOut();
@@ -185,11 +185,11 @@ public class Action {
 		return gState;
 	}
 	
-	public GameState exec(State beginState) {
-		getDefaultTarget(beginState);
-		getDefaultTrajectory(beginState);
-		getDefaultTapTime(beginState);
-		return this.defaultAction(beginState);
+	public GameState exec(State beginState, Vision vision, ClientNaiveAgent client) {
+		getDefaultTarget(beginState, vision, client);
+		getDefaultTrajectory(beginState, vision, client);
+		getDefaultTapTime(beginState, vision, client);
+		return this.defaultAction(beginState, vision, client);
 		
 	}
 

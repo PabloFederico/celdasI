@@ -9,35 +9,36 @@ import ab.vision.Vision;
 
 public class State {
 
-	private Vision vision;
-	public Vision getVision() {
+	//TODO needs to remove vision from the class
+	//private Vision vision;
+	/*public Vision getVision() {
 		return vision;
-	}
+	}*/
 
-	public void setVision(Vision vision) {
+	/*public void setVision(Vision vision) {
 		this.vision = vision;
-	}
+	}*/
 
-	public ClientNaiveAgent getClientNaiveAgent() {
+	/*public ClientNaiveAgent getClientNaiveAgent() {
 		return clientNaiveAgent;
-	}
+	}*/
 
-	public void setClientNaiveAgent(ClientNaiveAgent clientNaiveAgent) {
+	/*public void setClientNaiveAgent(ClientNaiveAgent clientNaiveAgent) {
 		this.clientNaiveAgent = clientNaiveAgent;
-	}
+	}*/
 
 	private List<ABObject> pigs;
-	private ClientNaiveAgent clientNaiveAgent;
+	//TODO needs to remove this
+	//private ClientNaiveAgent clientNaiveAgent;
 	private GameState state;
 
 	public State(Vision vision, ClientNaiveAgent clientNaiveAgent) {
-		this.vision 			= vision;
-		this.clientNaiveAgent 	= clientNaiveAgent;
-		this.disassembleVision();
+		//this.clientNaiveAgent 	= clientNaiveAgent;
+		this.disassembleVision(vision, clientNaiveAgent);
 		
 	}
 	
-	private void disassembleVision(){
+	private void disassembleVision(Vision vision, ClientNaiveAgent clientNaiveAgent){
 		setPigs(vision.findPigsMBR());
 		state = clientNaiveAgent.ar.checkState();
 	}

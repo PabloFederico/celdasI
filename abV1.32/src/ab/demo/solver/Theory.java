@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import ab.demo.ClientNaiveAgent;
+import ab.vision.Vision;
+
 public class Theory {
 	
 	private transient State beginState;
@@ -67,9 +70,9 @@ public class Theory {
 		setUseNumber(getUseNumber() + 1);
 	}
 
-	public void use() {
+	public void use(Vision vision, ClientNaiveAgent client) {
 		this.action = new Action();
-		this.action.exec(beginState);
+		this.action.exec(beginState, vision, client);
 	}
 
 	public void addEndState(State endState) {
