@@ -9,27 +9,10 @@ import ab.vision.Vision;
 
 public class State {
 
-	//TODO needs to remove vision from the class
-	//private Vision vision;
-	/*public Vision getVision() {
-		return vision;
-	}*/
+	//TODO eliminate pigs
+	//private List<ABObject> pigs;
+	Integer pigsQuantity = 0;
 
-	/*public void setVision(Vision vision) {
-		this.vision = vision;
-	}*/
-
-	/*public ClientNaiveAgent getClientNaiveAgent() {
-		return clientNaiveAgent;
-	}*/
-
-	/*public void setClientNaiveAgent(ClientNaiveAgent clientNaiveAgent) {
-		this.clientNaiveAgent = clientNaiveAgent;
-	}*/
-
-	private List<ABObject> pigs;
-	//TODO needs to remove this
-	//private ClientNaiveAgent clientNaiveAgent;
 	private GameState state;
 
 	public State(Vision vision, ClientNaiveAgent clientNaiveAgent) {
@@ -39,18 +22,27 @@ public class State {
 	}
 	
 	private void disassembleVision(Vision vision, ClientNaiveAgent clientNaiveAgent){
-		setPigs(vision.findPigsMBR());
+		setPigsQuantity(vision.findPigsMBR().size());
 		state = clientNaiveAgent.ar.checkState();
 	}
+	
 
-	public List<ABObject> getPigs() {
+	/*public List<ABObject> getPigs() {
 		return pigs;
 	}
 
 	public void setPigs(List<ABObject> pigs) {
 		this.pigs = pigs;
-	}
+	}*/
 	
+	public Integer getPigsQuantity() {
+		return pigsQuantity;
+	}
+
+	public void setPigsQuantity(Integer pigsQuantity) {
+		this.pigsQuantity = pigsQuantity;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -61,7 +53,7 @@ public class State {
 			return false;
 		State other = (State) obj;
 		
-		return this.pigs.size() == other.getPigs().size();
+		return this.pigsQuantity == other.getPigsQuantity();
 	}
 
 	public boolean isEqual(State beginState) {
