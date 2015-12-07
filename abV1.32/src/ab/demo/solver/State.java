@@ -15,6 +15,16 @@ public class State {
 
 	private GameState state;
 
+	public State() {}
+	
+	public GameState getState() {
+		return state;
+	}
+
+	public void setState(GameState state) {
+		this.state = state;
+	}
+
 	public State(Vision vision, ClientNaiveAgent clientNaiveAgent) {
 		//this.clientNaiveAgent 	= clientNaiveAgent;
 		this.disassembleVision(vision, clientNaiveAgent);

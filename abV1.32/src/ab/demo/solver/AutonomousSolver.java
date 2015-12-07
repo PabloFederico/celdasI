@@ -7,15 +7,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -30,6 +38,7 @@ public class AutonomousSolver extends Solver{
 	private State state;
 	private List<State> states = null;
 	public Set<Theory> theories = null;	
+	
 	
 	public AutonomousSolver(){
 		states = new ArrayList<State>();
@@ -93,12 +102,18 @@ public class AutonomousSolver extends Solver{
 	
 	@Override
 	public void save() {
+		
 		try {
-			File out = new File("fileJ.json");
+			File out = new File(path);
 			ObjectMapper mapper = new ObjectMapper();
-			for (Theory t : theories) {
+			mapper.enable(SerializationFeature.INDENT_OUTPUT);
+			Path file = Paths.get(path);
+			List <String> line = Arrays.asList("Number of theories: " + theories.size());
+			Files.write(file, line, Charset.forName("UTF-8"));
+			/*for (Theory t : theories) {
 				mapper.writeValue(out, t);
-			}
+			}*/
+			mapper.writeValue(out, theories);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (JsonGenerationException e) {
@@ -113,5 +128,29 @@ public class AutonomousSolver extends Solver{
 		}
         
 	}
+	@Override
+	public void load() {
+		File file = new File(path);
+		if (!file.exists() || file.isDirectory()) {
+			//TODO Replace with logger
+			System.out.println("Couldn't load theory configuration");
+			return;
+		}
+		try {
+			theories = new ObjectMapper().readValue(file, new TypeReference<Set<Theory>>() {});
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 
 }
