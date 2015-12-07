@@ -77,4 +77,9 @@ public class State {
 		return "State []";
 	}
 
+
+	public boolean isSimilar(State beginState) {
+		return this.pigsQuantity <= beginState.getPigsQuantity();
+	}
+
 }

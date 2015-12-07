@@ -57,9 +57,8 @@ public class AutonomousSolver extends Solver{
 			theory.addBeginState(state);
 			
 			List<Theory> teoriesEquals =  Theory.getEquals(theory, theories);
-			Theory maxTeory = null;
 			if(!teoriesEquals.isEmpty()){
-				// SI hay muchas similares agarramos la de mayor ponderacion
+				// SI hay muchas iguales agarramos la de mayor ponderacion
 				System.out.println("Hay teorias iguales");
 				float maxRange = 0;
 				for (Theory t : teoriesEquals) { 
@@ -72,18 +71,32 @@ public class AutonomousSolver extends Solver{
 				theory.incUses();	
 				theory.use(vision, client);
 			}else{ 
-				
-				//Ponderamos y agregamos la teoria local
-				if(!this.theories.contains(theory)){
-					System.out.println("Not Contains theory");
-					this.theories.add(theory);	
-				}else{
-					System.out.println("theory usasada");
-				}
-				theory.incUses();
-				theory.use(vision, client);
-			}	
-			
+				List<Theory> teoriesSimilar =  Theory.getSimilars(theory, theories);
+				if(!teoriesSimilar.isEmpty()){
+					// SI hay muchas iguales agarramos la de mayor ponderacion
+					System.out.println("Hay teorias similares");
+					float maxRange = 0;
+					for (Theory t : teoriesEquals) { 
+						float range = t.getSuccessNumber() /  t.getUseNumber();
+						if (range > maxRange){
+							maxRange = range;
+							theory = t;
+						}	
+					}
+					theory.incUses();	
+					theory.use(vision, client);
+				}else{ 
+					//Ponderamos y agregamos la teoria local
+					if(!this.theories.contains(theory)){
+						System.out.println("Not Contains theory");
+						this.theories.add(theory);	
+					}else{
+						System.out.println("theory usasada");
+					}
+					theory.incUses();
+					theory.use(vision, client);
+				}	
+			}
 			State endState = sensor.checkEnviroment();
 			
 			if (endState.pigsQuantity < this.state.pigsQuantity){

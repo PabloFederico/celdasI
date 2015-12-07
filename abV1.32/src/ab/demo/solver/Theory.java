@@ -31,6 +31,7 @@ public class Theory {
 		  return similarTeories;
 	}
 	
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -121,13 +122,8 @@ public class Theory {
 		return action;
 	}
 
-	protected Boolean isSimilar(Theory theory){
-		if ((action.isEqual(theory.getAction()))&&
-				(endState.isEqual(theory.getEndState()))) {
-			return true;			
-		}
-		
-		return false;
+	protected boolean isSimilar(Theory theory){
+		return beginState.isSimilar(theory.getBeginState());
 		
 	}
 	
