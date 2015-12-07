@@ -170,5 +170,9 @@ public class DefaultSolver extends Solver{
 		return state;
 	}
 
+	@Override
+	public void save() {
+	}
+
 
 }

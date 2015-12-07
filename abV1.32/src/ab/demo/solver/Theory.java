@@ -4,40 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-
 public class Theory {
-
+	
 	private State beginState;
 	private State endState;
 	private Action action;
 	private int successNumber;
 	private int useNumber;
 	
-	public State getBeginState() {
-		return beginState;
+	public Theory() {
+		successNumber = 0;
+		setUseNumber(0);
 	}
 
-	public Action getAction() {
-		return action;
-	}
-
-
-	public void setAction(Action action) {
-		this.action = action;
-	}
-
-	public void setBeginState(State beginState) {
-		this.beginState = beginState;
-	}
-
-
-
-	public void addBeginState(State state) {
-		this.beginState = state;
-		
-	}
-	
-	
 	public static List<Theory> getEquals(Theory toCompare, Set<Theory> persistenTeories){
 		   List<Theory> similarTeories = new ArrayList<Theory>();
 		   for (Theory obj : persistenTeories) {
@@ -64,17 +43,29 @@ public class Theory {
 	private boolean isSuccessful() {
 		return this.successNumber == this.useNumber;
 	}
+	
+	public static List<Theory> getSimilars(Theory theory, Set<Theory> theories) {
+		List<Theory> similarTheories = new ArrayList<Theory>();
+		
+		for (Theory t : theories) {
+			if (theory.isSimilar(t)) {
+				similarTheories.add(t);
+			}
+		}
+		return similarTheories;
+	}
 
+	public void addBeginState(State state) {
+		this.beginState = state;
+	}
 
 	public void incrementSucces() {
-		this.successNumber++;	
+		successNumber++;
 	}
-
 
 	public void incUses() {
-		this.useNumber++;
+		setUseNumber(getUseNumber() + 1);
 	}
-
 
 	public void use() {
 		this.action = new Action();
@@ -83,8 +74,65 @@ public class Theory {
 
 	public void addEndState(State endState) {
 		this.endState = endState;
-		
 	}
 
+	public int getSuccessNumber() {
+		return successNumber;
+	}
+
+	public void setSuccessNumber(int successNumber) {
+		this.successNumber = successNumber;
+	}
+
+	public int getUseNumber() {
+		return useNumber;
+	}
+
+	public void setUseNumber(int useNumber) {
+		this.useNumber = useNumber;
+	}
+	
+	protected Boolean isEqual(Theory theory){
+		
+		if ((beginState.isEqual(theory.getBeginState()))&&
+				(action.isEqual(theory.getAction()))&&
+				(endState.isEqual(theory.getEndState()))) {
+			return true;			
+		}
+		
+		return false;
+		
+	}
+	
+	public State getBeginState() {
+		return beginState;
+	}
+
+	public State getEndState() {
+		return endState;
+	}
+
+	public Action getAction() {
+		return action;
+	}
+
+	protected Boolean isSimilar(Theory theory){
+		if ((action.isEqual(theory.getAction()))&&
+				(endState.isEqual(theory.getEndState()))) {
+			return true;			
+		}
+		
+		return false;
+		
+	}
+	
+	@Override
+	public String toString() {
+		
+		return "Theory [successNumber="+this.successNumber+"]";
+		/*return "Theory [beginState="+this.beginState+", endState="+this.endState+
+				", action="+this.action+", successNumber="+this.successNumber+
+				", useNumber="+this.useNumber+"]";*/
+	}
 
 }

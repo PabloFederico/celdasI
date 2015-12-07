@@ -193,5 +193,17 @@ public class Action {
 		
 	}
 
+	public boolean isEqual(Action action) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return "Action [target="+this.target+", trajectory="+this.trajectory+
+				", tapTime="+this.tapTime+", releasePoint="+this.releasePoint+
+				", refPoint="+this.refPoint+"]";
+	}
+
 }
 
