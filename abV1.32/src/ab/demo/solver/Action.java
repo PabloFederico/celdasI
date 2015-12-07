@@ -6,33 +6,22 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import ab.demo.ClientNaiveAgent;
 import ab.vision.ABObject;
 import ab.vision.Vision;
 import ab.vision.GameStateExtractor.GameState;
 
+
 public class Action {
-	private Point target;
-	private ArrayList<Point> trajectory;
+	//private Point target;
+	//private ArrayList<Point> trajectory;
 	private int tapTime; //[1 - (0, 60 %) ]
-	private Point releasePoint;
-	private Point refPoint;
+	//private Point releasePoint;
+	//private Point refPoint;
 	
-	public Point getTarget() {
-		return target;
-	}
-	
-	public void setTarget(Point target) {
-		this.target = target;
-	}
-	
-	public ArrayList<Point> getTrajectory() {
-		return trajectory;
-	}
-	
-	public void setTrajectory(ArrayList<Point> trajectory) {
-		this.trajectory = trajectory;
-	}
+
 	
 	public int getTapTime() {
 		return tapTime;
@@ -42,13 +31,14 @@ public class Action {
 		this.tapTime = tapTime;
 	} 
 	
-	public void getDefaultTapTime(State state){
-		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
-		Rectangle sling = state.getVision().findSlingshotMBR();
+
+	public void getDefaultTapTime(State state, Vision vision, ClientNaiveAgent clientNaiveAgent, Point target, Point releasePoint){
+		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		Rectangle sling = vision.findSlingshotMBR();//state.getVision().findSlingshotMBR();
 		
 		// Get the release point from the trajectory prediction module
 		int tapTime = 0;
-		if (this.releasePoint != null) {
+		if (releasePoint != null) {
 			double releaseAngle = clientNaiveAgent.tp.getReleaseAngle(sling,
 					releasePoint);
 			System.out.println("Release Point: " + releasePoint);
@@ -72,20 +62,29 @@ public class Action {
 					tapInterval =  60;
 			}
 			
-			tapTime = clientNaiveAgent.tp.getTapTime(sling, releasePoint, this.target, tapInterval);
+			tapTime = clientNaiveAgent.tp.getTapTime(sling, releasePoint, target, tapInterval);
 			
 		} 
 		this.tapTime = tapTime;
 		
 	}
-	public void getDefaultTrajectory(State state){
+	
+	public ArrayList<Point> getDefaultTrajectory(State state, Vision vision, ClientNaiveAgent clientNaiveAgent, Point target){
 		
-		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
-		Rectangle sling = state.getVision().findSlingshotMBR();
-		Point releasePoint = null;
+		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		Rectangle sling = vision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();
 		
 		// estimate the trajectory
-		ArrayList<Point> pts = clientNaiveAgent.tp.estimateLaunchPoint(sling, this.target);
+		ArrayList<Point> pts = clientNaiveAgent.tp.estimateLaunchPoint(sling, target);
+		
+		
+		return pts;
+	}
+	
+	private Point getReleasePoint (State state, Vision vision, ClientNaiveAgent clientNaiveAgent, ArrayList<Point> pts) {
+		
+		Point releasePoint = null;
+		
 		// do a high shot when entering a level to find an accurate velocity
 		if (clientNaiveAgent.firstShot && pts.size() > 1) {
 			releasePoint = pts.get(1);
@@ -104,19 +103,20 @@ public class Action {
 					else
 					releasePoint = pts.get(0);
 				}
-		this.refPoint  = clientNaiveAgent.tp.getReferencePoint(sling);
-		this.trajectory = pts;
-		this.releasePoint = releasePoint;
+		
+		return releasePoint;
 	}
 	
-	public void getDefaultTarget(State state){
+	
+	public Point getDefaultTarget(State state, Vision vision, ClientNaiveAgent clientNaiveAgent){
+		Point target = null;
 		
-		List<ABObject> pigs = state.getPigs();
-		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		List<ABObject> pigs = vision.findPigsMBR();
+		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		ABObject pig = null;
 		
 		if (pigs.isEmpty()) {
-			return;
+			return target;
 		}
 		pig = pigs.get(clientNaiveAgent.randomGenerator.nextInt(pigs.size()));
 		
@@ -131,13 +131,24 @@ public class Action {
 		}
 
 		clientNaiveAgent.prevTarget = new Point(_tpt.x, _tpt.y);
-		this.target = clientNaiveAgent.prevTarget;
+		target = clientNaiveAgent.prevTarget;
+		return target;
 	}
 	
-	public GameState defaultAction(State state){
+	
+	public GameState defaultAction(State state, Vision oldVision, ClientNaiveAgent clientNaiveAgent){
 		
-		ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
-		Rectangle sling = state.getVision().findSlingshotMBR();
+		Rectangle sling = oldVision.findSlingshotMBR();
+		
+		Point target = getDefaultTarget(state, oldVision, clientNaiveAgent);
+		ArrayList<Point> trajectory = getDefaultTrajectory(state, oldVision, clientNaiveAgent, target);
+		Point refPoint  = clientNaiveAgent.tp.getReferencePoint(sling);
+		Point releasePoint = getReleasePoint(state, oldVision, clientNaiveAgent, trajectory);
+		
+		getDefaultTapTime(state, oldVision, clientNaiveAgent, target, releasePoint);
+		
+		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
+		//Rectangle sling = oldVision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();
 		
 		// check whether the slingshot is changed. the change of the slingshot indicates a change in the scale.
 		clientNaiveAgent.ar.fullyZoomOut();
@@ -147,7 +158,7 @@ public class Action {
 		Rectangle _sling = vision.findSlingshotMBR();
 		
 		System.out.println("check release Points");
-		if( this.releasePoint == null){
+		if( releasePoint == null){
 			System.err.println("No Release Point Found");
 			return clientNaiveAgent.ar.checkState();
 		}
@@ -185,11 +196,9 @@ public class Action {
 		return gState;
 	}
 	
-	public GameState exec(State beginState) {
-		getDefaultTarget(beginState);
-		getDefaultTrajectory(beginState);
-		getDefaultTapTime(beginState);
-		return this.defaultAction(beginState);
+	public GameState exec(State beginState, Vision vision, ClientNaiveAgent client) {
+		
+		return this.defaultAction(beginState, vision, client);
 		
 	}
 
@@ -198,12 +207,12 @@ public class Action {
 		return false;
 	}
 	
-	@Override
+	/*@Override
 	public String toString() {
 		return "Action [target="+this.target+", trajectory="+this.trajectory+
 				", tapTime="+this.tapTime+", releasePoint="+this.releasePoint+
 				", refPoint="+this.refPoint+"]";
-	}
+	}*/
 
 }
 

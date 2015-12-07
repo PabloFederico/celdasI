@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import ab.demo.ClientNaiveAgent;
+import ab.vision.Vision;
+
 public class Theory {
 	
-	private State beginState;
-	private State endState;
-	private Action action;
+	private transient State beginState;
+	private transient State endState;
+	private transient Action action;
 	private int successNumber;
 	private int useNumber;
 	
@@ -67,9 +70,9 @@ public class Theory {
 		setUseNumber(getUseNumber() + 1);
 	}
 
-	public void use() {
+	public void use(Vision vision, ClientNaiveAgent client) {
 		this.action = new Action();
-		this.action.exec(beginState);
+		this.action.exec(beginState, vision, client);
 	}
 
 	public void addEndState(State endState) {

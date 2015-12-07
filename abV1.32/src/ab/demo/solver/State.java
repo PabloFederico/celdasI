@@ -9,47 +9,40 @@ import ab.vision.Vision;
 
 public class State {
 
-	private Vision vision;
-	public Vision getVision() {
-		return vision;
-	}
+	//TODO eliminate pigs
+	//private List<ABObject> pigs;
+	Integer pigsQuantity = 0;
 
-	public void setVision(Vision vision) {
-		this.vision = vision;
-	}
-
-	public ClientNaiveAgent getClientNaiveAgent() {
-		return clientNaiveAgent;
-	}
-
-	public void setClientNaiveAgent(ClientNaiveAgent clientNaiveAgent) {
-		this.clientNaiveAgent = clientNaiveAgent;
-	}
-
-	private List<ABObject> pigs;
-	private ClientNaiveAgent clientNaiveAgent;
 	private GameState state;
 
 	public State(Vision vision, ClientNaiveAgent clientNaiveAgent) {
-		this.vision 			= vision;
-		this.clientNaiveAgent 	= clientNaiveAgent;
-		this.disassembleVision();
+		//this.clientNaiveAgent 	= clientNaiveAgent;
+		this.disassembleVision(vision, clientNaiveAgent);
 		
 	}
 	
-	private void disassembleVision(){
-		setPigs(vision.findPigsMBR());
+	private void disassembleVision(Vision vision, ClientNaiveAgent clientNaiveAgent){
+		setPigsQuantity(vision.findPigsMBR().size());
 		state = clientNaiveAgent.ar.checkState();
 	}
+	
 
-	public List<ABObject> getPigs() {
+	/*public List<ABObject> getPigs() {
 		return pigs;
 	}
 
 	public void setPigs(List<ABObject> pigs) {
 		this.pigs = pigs;
-	}
+	}*/
 	
+	public Integer getPigsQuantity() {
+		return pigsQuantity;
+	}
+
+	public void setPigsQuantity(Integer pigsQuantity) {
+		this.pigsQuantity = pigsQuantity;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -60,7 +53,7 @@ public class State {
 			return false;
 		State other = (State) obj;
 		
-		return this.pigs.size() == other.getPigs().size();
+		return this.pigsQuantity == other.getPigsQuantity();
 	}
 
 	public boolean isEqual(State beginState) {

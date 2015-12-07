@@ -11,7 +11,8 @@ import ab.vision.GameStateExtractor.GameState;
 
 public class Sensor {
 
-		private ClientNaiveAgent clientNaiveAgent; 
+		private ClientNaiveAgent clientNaiveAgent;
+		private Vision vision;
 		private static final Logger log = Logger.getLogger( Sensor.class.getName() );
 		
 		public Sensor(ClientNaiveAgent clientNaiveAgent){
@@ -23,7 +24,7 @@ public class Sensor {
 			BufferedImage screenshot = clientNaiveAgent.ar.doScreenShot();
 
 			// process image
-			Vision vision = new Vision(screenshot);
+			this.vision = new Vision(screenshot);
 			
 			Rectangle sling = vision.findSlingshotMBR();
 
@@ -44,6 +45,14 @@ public class Sensor {
 			
 			return new State(vision, clientNaiveAgent);
 			
+		}
+		
+		public ClientNaiveAgent getClientNaiveAgent() {
+			return clientNaiveAgent;
+		}
+
+		public Vision getVision() {
+			return vision;
 		}
 
 
