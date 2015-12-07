@@ -166,14 +166,14 @@ public class Action {
 		}
 		if(_sling != null)
 		{
-			System.out.println("hay _sling");
+			//System.out.println("hay _sling");
 			double scale_diff = Math.pow((sling.width - _sling.width),2) +  Math.pow((sling.height - _sling.height),2);
 			if(scale_diff < 25)
 			{
-				System.out.println("dif scala");
+				//System.out.println("dif scala");
 				int dx = (int) releasePoint.getX() - refPoint.x;
 				int dy = (int) releasePoint.getY() - refPoint.y;
-				System.out.println("dx dy");
+				//System.out.println("dx dy");
 				if(dx < 0)
 				{
 					long timer = System.currentTimeMillis();

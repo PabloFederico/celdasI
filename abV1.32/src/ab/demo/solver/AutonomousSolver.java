@@ -44,6 +44,7 @@ public class AutonomousSolver extends Solver{
 		states = new ArrayList<State>();
 		this.theories = new HashSet<Theory>();	
 	}
+	
 	@Override
 	public GameState solve(ClientNaiveAgent clientNaiveAgent) {
 		this.sensor = new Sensor(clientNaiveAgent);
@@ -56,24 +57,39 @@ public class AutonomousSolver extends Solver{
 			theory.addBeginState(state);
 			
 			List<Theory> teoriesEquals =  Theory.getEquals(theory, theories);
+			Theory maxTeory = null;
 			if(!teoriesEquals.isEmpty()){
-				// Ponderacion de teorias
+				// SI hay muchas similares agarramos la de mayor ponderacion
+				System.out.println("Hay teorias iguales");
+				float maxRange = 0;
 				for (Theory t : teoriesEquals) { 
-					t.incrementSucces();
-					t.incUses();	
-					t.use(vision, client);
+					float range = t.getSuccessNumber() /  t.getUseNumber();
+					if (range > maxRange){
+						maxRange = range;
+						theory = t;
+					}	
 				}
+				theory.incUses();	
+				theory.use(vision, client);
 			}else{ 
 				
 				//Ponderamos y agregamos la teoria local
 				if(!this.theories.contains(theory)){
-					theory.incrementSucces();
-					theory.incUses();
-					this.theories.add(theory);
-					theory.use(vision, client);
+					System.out.println("Not Contains theory");
+					this.theories.add(theory);	
+				}else{
+					System.out.println("theory usasada");
 				}
-			}			 
+				theory.incUses();
+				theory.use(vision, client);
+			}	
+			
 			State endState = sensor.checkEnviroment();
+			
+			if (endState.pigsQuantity < this.state.pigsQuantity){
+				theory.incrementSucces();
+			}
+			
 			theory.addEndState(endState);
 		} catch (IOException e) {
 			e.printStackTrace();
