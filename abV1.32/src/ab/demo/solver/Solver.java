@@ -17,8 +17,20 @@ import ab.vision.Vision;
 
 public abstract class Solver{
 	
+	protected String path = "Theories.json";
+	
 	public abstract GameState solve(ClientNaiveAgent clientNaiveAgent);
 	
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 	public abstract void save();
+	
+	public abstract void load();
 
 }

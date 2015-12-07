@@ -174,5 +174,10 @@ public class DefaultSolver extends Solver{
 	public void save() {
 	}
 
+	@Override
+	public void load() {
+		
+	}
+
 
 }

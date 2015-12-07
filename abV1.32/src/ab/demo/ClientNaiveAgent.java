@@ -130,6 +130,9 @@ public class ClientNaiveAgent implements Runnable {
 		ar.loadLevel(currentLevel);
 		//ar.loadLevel((byte)9);
 		GameState state;
+		System.out.println("Loading...");
+		this.getSolver().load();
+		System.out.println("Theories Loaded");
 		while (true) {
 			
 			state = solve();
@@ -145,7 +148,9 @@ public class ClientNaiveAgent implements Runnable {
 				//display the global best scores
 				int[] scores = ar.checkScore();
 				System.out.println("Global best score: ");
+				System.out.println("Saving...");
 				this.getSolver().save();
+				System.out.println("Theories Saved");
 				for (int i = 0; i < scores.length ; i ++)
 				{
 				

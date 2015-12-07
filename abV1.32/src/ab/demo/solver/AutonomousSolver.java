@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -36,6 +38,7 @@ public class AutonomousSolver extends Solver{
 	private State state;
 	private List<State> states = null;
 	public Set<Theory> theories = null;	
+	
 	
 	public AutonomousSolver(){
 		states = new ArrayList<State>();
@@ -99,7 +102,6 @@ public class AutonomousSolver extends Solver{
 	
 	@Override
 	public void save() {
-		String path = "Theories.json";
 		
 		try {
 			File out = new File(path);
@@ -126,5 +128,29 @@ public class AutonomousSolver extends Solver{
 		}
         
 	}
+	@Override
+	public void load() {
+		File file = new File(path);
+		if (!file.exists() || file.isDirectory()) {
+			//TODO Replace with logger
+			System.out.println("Couldn't load theory configuration");
+			return;
+		}
+		try {
+			theories = new ObjectMapper().readValue(file, new TypeReference<Set<Theory>>() {});
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 
 }
