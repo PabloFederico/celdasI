@@ -73,7 +73,8 @@ public class Action {
 		
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		Rectangle sling = vision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();
-		
+		if (sling == null || target == null)
+			return null;
 		// estimate the trajectory
 		ArrayList<Point> pts = clientNaiveAgent.tp.estimateLaunchPoint(sling, target);
 		
@@ -84,7 +85,8 @@ public class Action {
 	private Point getReleasePoint (State state, Vision vision, ClientNaiveAgent clientNaiveAgent, ArrayList<Point> pts) {
 		
 		Point releasePoint = null;
-		
+		if (pts == null)
+			return releasePoint;
 		// do a high shot when entering a level to find an accurate velocity
 		if (clientNaiveAgent.firstShot && pts.size() > 1) {
 			releasePoint = pts.get(1);
