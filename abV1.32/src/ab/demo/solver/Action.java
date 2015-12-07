@@ -18,10 +18,13 @@ public class Action {
 	//private Point target;
 	//private ArrayList<Point> trajectory;
 	private int tapTime; //[1 - (0, 60 %) ]
+	private TargetType target;
 	//private Point releasePoint;
 	//private Point refPoint;
 	
-
+	public enum TargetType {
+		PIG
+	}
 	
 	public int getTapTime() {
 		return tapTime;
@@ -113,6 +116,7 @@ public class Action {
 	public Point getDefaultTarget(State state, Vision vision, ClientNaiveAgent clientNaiveAgent){
 		Point target = null;
 		
+		this.target = TargetType.PIG;
 		List<ABObject> pigs = vision.findPigsMBR();
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		ABObject pig = null;

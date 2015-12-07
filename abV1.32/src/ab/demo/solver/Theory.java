@@ -20,10 +20,12 @@ public class Theory {
 		setUseNumber(0);
 	}
 
-	public static List<Theory> getEquals(Theory toCompare, Set<Theory> persistenTeories){
+	public static List<Theory> getEquals(Theory toCompare, Set<Theory> persistenTheories){
 		   List<Theory> similarTeories = new ArrayList<Theory>();
-		   for (Theory obj : persistenTeories) {
-			   if (toCompare.equals(obj) && obj.isSuccessful()) similarTeories.add(obj);
+		   for (Theory obj : persistenTheories) {
+			   if (toCompare.equals(obj) && obj.isSuccessful()) {
+				   similarTeories.add(obj);
+			   }
 		   }
 		   
 		  return similarTeories;
@@ -35,12 +37,12 @@ public class Theory {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (this.getClass() != obj.getClass())
 			return false;
 		Theory other = (Theory) obj;
 		
 		
-		return this.beginState == other.getBeginState();
+		return this.beginState.equals(other.getBeginState());
 	}
 	
 	private boolean isSuccessful() {
