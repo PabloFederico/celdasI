@@ -18,6 +18,16 @@ public class Action {
 	//private Point target;
 	//private ArrayList<Point> trajectory;
 	private int tapTime; //[1 - (0, 60 %) ]
+	
+	
+	public TargetType getTarget() {
+		return target;
+	}
+
+	public void setTarget(TargetType target) {
+		this.target = target;
+	}
+
 	private TargetType target;
 	//private Point releasePoint;
 	//private Point refPoint;
