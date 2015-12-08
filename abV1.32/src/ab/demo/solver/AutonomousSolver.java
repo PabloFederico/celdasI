@@ -37,6 +37,7 @@ public class AutonomousSolver extends Solver{
 	private Sensor sensor;
 	private State state;
 	private List<State> states = null;
+	private int teoriasUsadas = 0;
 	public Set<Theory> theories = null;	
 	
 	
@@ -70,6 +71,7 @@ public class AutonomousSolver extends Solver{
 				}
 				theory.incUses();	
 				theory.use(vision, client);
+				teoriasUsadas++;
 			}else{ 
 				List<Theory> teoriesSimilar =  Theory.getSimilars(theory, theories);
 				if(!teoriesSimilar.isEmpty()){
@@ -85,6 +87,7 @@ public class AutonomousSolver extends Solver{
 					}
 					theory.incUses();	
 					theory.use(vision, client);
+					teoriasUsadas++;
 				}else{ 
 					//Ponderamos y agregamos la teoria local
 					if(!this.theories.contains(theory)){
@@ -95,6 +98,7 @@ public class AutonomousSolver extends Solver{
 					}
 					theory.incUses();
 					theory.use(vision, client);
+					teoriasUsadas++;
 				}	
 			}
 			State endState = sensor.checkEnviroment();
@@ -104,6 +108,8 @@ public class AutonomousSolver extends Solver{
 			}
 			
 			theory.addEndState(endState);
+			System.out.println("Teorias Usadas: " + teoriasUsadas);
+			System.out.println("Teorias En Memorias: " + theories.size());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

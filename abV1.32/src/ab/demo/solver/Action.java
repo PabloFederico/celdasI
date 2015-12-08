@@ -18,23 +18,38 @@ public class Action {
 	//private Point target;
 	//private ArrayList<Point> trajectory;
 	private int tapTime; //[1 - (0, 60 %) ]
-	
-	
-	public TargetType getTarget() {
-		return target;
+	private Point target;
+	private Target serializableTarget;
+	private ArrayList<Point> trajectory;
+	private ArrayList<Target> serializableTrajectory;
+	public ArrayList<Target> getSerializableTrajectory() {
+		return serializableTrajectory;
 	}
 
-	public void setTarget(TargetType target) {
-		this.target = target;
+	public void setSerializableTrajectory(ArrayList<Target> serializableTrajectory) {
+		this.serializableTrajectory = serializableTrajectory;
 	}
 
-	private TargetType target;
-	//private Point releasePoint;
-	//private Point refPoint;
+	private Point releasePoint;
+	private Target serializableReleasePoint;
 	
-	public enum TargetType {
-		PIG
+
+	public Target getSerializableReleasePoint() {
+		return serializableReleasePoint;
 	}
+
+	public void setSerializableReleasePoint(Target serializableReleasePoint) {
+		this.serializableReleasePoint = serializableReleasePoint;
+	}
+
+	public Target getSerializableTarget() {
+		return serializableTarget;
+	}
+
+	public void setSerializableTarget(Target target) {
+		this.serializableTarget = target;
+	}
+
 	
 	public int getTapTime() {
 		return tapTime;
@@ -82,24 +97,25 @@ public class Action {
 		
 	}
 	
-	public ArrayList<Point> getDefaultTrajectory(State state, Vision vision, ClientNaiveAgent clientNaiveAgent, Point target){
+	public void getDefaultTrajectory(State state, Vision vision, ClientNaiveAgent clientNaiveAgent, Point target){
 		
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		Rectangle sling = vision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();
+		this.trajectory = null;
 		if (sling == null || target == null)
-			return null;
+			return;
 		// estimate the trajectory
 		ArrayList<Point> pts = clientNaiveAgent.tp.estimateLaunchPoint(sling, target);
 		
 		
-		return pts;
+		this.trajectory = pts;
 	}
 	
-	private Point getReleasePoint (State state, Vision vision, ClientNaiveAgent clientNaiveAgent, ArrayList<Point> pts) {
+	private void getReleasePoint (State state, Vision vision, ClientNaiveAgent clientNaiveAgent, ArrayList<Point> pts) {
 		
-		Point releasePoint = null;
+		this.releasePoint = null;
 		if (pts == null)
-			return releasePoint;
+			return;
 		// do a high shot when entering a level to find an accurate velocity
 		if (clientNaiveAgent.firstShot && pts.size() > 1) {
 			releasePoint = pts.get(1);
@@ -119,20 +135,20 @@ public class Action {
 					releasePoint = pts.get(0);
 				}
 		
-		return releasePoint;
+		return;
 	}
 	
 	
-	public Point getDefaultTarget(State state, Vision vision, ClientNaiveAgent clientNaiveAgent){
+	public void getDefaultTarget(State state, Vision vision, ClientNaiveAgent clientNaiveAgent){
 		Point target = null;
 		
-		this.target = TargetType.PIG;
+		this.target = null;
 		List<ABObject> pigs = vision.findPigsMBR();
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		ABObject pig = null;
 		
 		if (pigs.isEmpty()) {
-			return target;
+			return;
 		}
 		pig = pigs.get(clientNaiveAgent.randomGenerator.nextInt(pigs.size()));
 		
@@ -148,20 +164,27 @@ public class Action {
 
 		clientNaiveAgent.prevTarget = new Point(_tpt.x, _tpt.y);
 		target = clientNaiveAgent.prevTarget;
-		return target;
+		this.target = target;
 	}
 	
+	public void initAction(State state, Vision oldVision, ClientNaiveAgent clientNaiveAgent){
+		Rectangle sling = oldVision.findSlingshotMBR();
+		
+		getDefaultTarget(state, oldVision, clientNaiveAgent);
+		getDefaultTrajectory(state, oldVision, clientNaiveAgent, target);
+		getReleasePoint(state, oldVision, clientNaiveAgent, trajectory);
+		
+		getDefaultTapTime(state, oldVision, clientNaiveAgent, target, releasePoint);
+		this.serializableTarget = new Target(target);
+		this.serializableReleasePoint = new Target(releasePoint);
+
+	}
 	
 	public GameState defaultAction(State state, Vision oldVision, ClientNaiveAgent clientNaiveAgent){
 		
 		Rectangle sling = oldVision.findSlingshotMBR();
-		
-		Point target = getDefaultTarget(state, oldVision, clientNaiveAgent);
-		ArrayList<Point> trajectory = getDefaultTrajectory(state, oldVision, clientNaiveAgent, target);
 		Point refPoint  = clientNaiveAgent.tp.getReferencePoint(sling);
-		Point releasePoint = getReleasePoint(state, oldVision, clientNaiveAgent, trajectory);
 		
-		getDefaultTapTime(state, oldVision, clientNaiveAgent, target, releasePoint);
 		
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		//Rectangle sling = oldVision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();

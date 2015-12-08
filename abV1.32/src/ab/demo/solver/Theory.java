@@ -23,7 +23,7 @@ public class Theory {
 	public static List<Theory> getEquals(Theory toCompare, Set<Theory> persistenTheories){
 		   List<Theory> similarTeories = new ArrayList<Theory>();
 		   for (Theory obj : persistenTheories) {
-			   if (toCompare.equals(obj) && obj.isSuccessful()) {
+			   if (toCompare.equals(obj)) {
 				   similarTeories.add(obj);
 			   }
 		   }
@@ -75,6 +75,7 @@ public class Theory {
 
 	public void use(Vision vision, ClientNaiveAgent client) {
 		this.action = new Action();
+		this.action.initAction(beginState, vision, client);
 		this.action.exec(beginState, vision, client);
 	}
 
