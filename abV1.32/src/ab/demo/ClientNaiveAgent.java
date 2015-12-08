@@ -101,6 +101,13 @@ public class ClientNaiveAgent implements Runnable {
 			level = solved.length;
 		return level; 
 	}
+	
+	
+	public int checkMyScore(int level){
+		int[] scores = ar.checkMyScore();
+		return scores[level];
+		
+	}
     /* 
      * Run the Client (Naive Agent)
      */

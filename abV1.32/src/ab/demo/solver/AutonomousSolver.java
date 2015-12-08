@@ -48,6 +48,7 @@ public class AutonomousSolver extends Solver{
 	
 	@Override
 	public GameState solve(ClientNaiveAgent clientNaiveAgent) {
+		
 		this.sensor = new Sensor(clientNaiveAgent);
 		ClientNaiveAgent client = sensor.getClientNaiveAgent();
 		try {
@@ -61,7 +62,7 @@ public class AutonomousSolver extends Solver{
 			if(!teoriesEquals.isEmpty()){
 				// SI hay muchas iguales agarramos la de mayor ponderacion
 				System.out.println("Hay teorias iguales");
-				float maxRange = 0;
+				float maxRange = -1;
 				for (Theory t : teoriesEquals) { 
 					float range = t.getSuccessNumber() /  t.getUseNumber();
 					if (range > maxRange){
@@ -69,23 +70,24 @@ public class AutonomousSolver extends Solver{
 						theory = t;
 					}	
 				}
-				theory.incUses();	
 				theory.use(vision, client);
+				theory.incUses();
 				teoriasUsadas++;
 			}else{ 
 				List<Theory> teoriesSimilar =  Theory.getSimilars(theory, theories);
 				if(!teoriesSimilar.isEmpty()){
 					// SI hay muchas iguales agarramos la de mayor ponderacion
 					System.out.println("Hay teorias similares");
-					float maxRange = 0;
-					for (Theory t : teoriesEquals) { 
+					float maxRange = -1;
+					for (Theory t : teoriesSimilar) { 
 						float range = t.getSuccessNumber() /  t.getUseNumber();
 						if (range > maxRange){
 							maxRange = range;
 							theory = t;
 						}	
 					}
-						
+					this.theories.add(theory);
+					theory.variateAction();
 					theory.use(vision, client);
 					theory.incUses();
 					teoriasUsadas++;

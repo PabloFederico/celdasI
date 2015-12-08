@@ -20,8 +20,12 @@ public class Action {
 	private int tapTime; //[1 - (0, 60 %) ]
 	private Point target;
 	private Target serializableTarget;
+	private int variateTarget = 5;
 	private ArrayList<Point> trajectory = new ArrayList<Point>();
 	private ArrayList<Target> serializableTrajectory = new ArrayList<Target>();
+	
+	public Action(){}
+	
 	public ArrayList<Target> getSerializableTrajectory() {
 		return serializableTrajectory;
 	}
@@ -61,7 +65,6 @@ public class Action {
 	
 
 	public void getDefaultTapTime(State state, Vision vision, ClientNaiveAgent clientNaiveAgent, Point target, Point releasePoint){
-		System.out.println("-------------------getDefaultTapTime----------------");
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		Rectangle sling = vision.findSlingshotMBR();//state.getVision().findSlingshotMBR();
 		
@@ -99,7 +102,6 @@ public class Action {
 	}
 	
 	public void getDefaultTrajectory(State state, Vision vision, ClientNaiveAgent clientNaiveAgent, Point target){
-		System.out.println("-------------------getDefaultTrajectory----------------");
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		Rectangle sling = vision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();
 		this.trajectory = null;
@@ -113,10 +115,8 @@ public class Action {
 	}
 	
 	private void getReleasePoint (State state, Vision vision, ClientNaiveAgent clientNaiveAgent, ArrayList<Point> pts) {
-		System.out.println("-------------------getReleasePoint----------------");
 		this.releasePoint = null;
 		if (pts == null){
-			System.out.println("-------------------Not trajetory----------------");
 			return;
 		}
 			
@@ -144,7 +144,6 @@ public class Action {
 	
 	
 	public void getDefaultTarget(State state, Vision vision, ClientNaiveAgent clientNaiveAgent){
-		System.out.println("-------------------getDefaultTarget----------------");
 		Point target = null;
 		
 		this.target = null;
@@ -256,6 +255,11 @@ public class Action {
 
 	public void convert() {
 		this.target = new Point();
+		if (this.serializableTarget == null){
+			System.out.println("Target en null");
+		}
+		
+		
 		this.target.x = this.serializableTarget.getX();
 		this.target.y = this.serializableTarget.getY();
 		
@@ -265,8 +269,15 @@ public class Action {
 			p.y = tg.getY();
 			this.trajectory.add(p);
 		}
+		this.releasePoint = new Point();
 		this.releasePoint.x = this.serializableReleasePoint.getX();
 		this.releasePoint.y = this.serializableReleasePoint.getY();
+	}
+
+	public void variate() {
+		this.serializableTarget.setX(this.serializableTarget.getX()+ this.variateTarget) ;
+		this.serializableTarget.setY(this.serializableTarget.getY()+ this.variateTarget) ;
+		this.variateTarget = this.variateTarget * (-1);
 	}
 	
 

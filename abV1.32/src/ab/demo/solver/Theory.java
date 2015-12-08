@@ -14,6 +14,7 @@ public class Theory {
 	private transient Action action;
 	private int successNumber;
 	private int useNumber;
+	private int score = 0;
 	
 	public Theory() {
 		successNumber = 0;
@@ -27,7 +28,6 @@ public class Theory {
 				   similarTeories.add(obj);
 			   }
 		   }
-		   
 		  return similarTeories;
 	}
 	
@@ -84,6 +84,8 @@ public class Theory {
 			this.action.initAction(beginState, vision, client);
 		}
 		this.action.exec(beginState, vision, client);
+		this.score = client.checkMyScore(client.currentLevel);
+		System.out.println("Score : " + score);
 	}
 
 	public void addEndState(State endState) {
@@ -142,6 +144,19 @@ public class Theory {
 		/*return "Theory [beginState="+this.beginState+", endState="+this.endState+
 				", action="+this.action+", successNumber="+this.successNumber+
 				", useNumber="+this.useNumber+"]";*/
+	}
+
+	public void variateAction() {
+		this.action.variate();
+		
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
 	}
 
 }

@@ -81,8 +81,10 @@ public class State {
 			return false;
 		State other = (State) obj;
 		boolean equalsQuantity = (this.pigsQuantity == other.getPigsQuantity());
-		if (!equalsQuantity)
+		if (!equalsQuantity){
 			return false;
+		}
+			
 		int i = 0;
 		for (Target pigPosition : pigsPosition) {
 			Target otherPosition = other.getPigsPosition().get(i);

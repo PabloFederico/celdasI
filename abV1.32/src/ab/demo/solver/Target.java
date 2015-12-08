@@ -8,8 +8,8 @@ public class Target {
 	private int x = 0;
 	private int y = 0;
 	private int RADIO = 10;
+	private int ERROR_RADIO = 4;
 	
-	private Point point;
 	
 	public int getX() {
 		return x;
@@ -26,13 +26,14 @@ public class Target {
 	public void setY(int y) {
 		this.y = y;
 	}
-
+	
+	public Target (){}
+	
 	public Target (Point point){
 		if (point == null)
 			return;
 		this.x = point.x;
 		this.y = point.y;
-		this.point = point;
 	}
 	
 	@Override
@@ -43,9 +44,12 @@ public class Target {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Target other = (Target) obj;
+		Target otherPosition = (Target) obj;
 		
-		return this.x == other.getX() && this.y == other.getY();
+		int x = this.x - otherPosition.getX();
+		int y = this.y - otherPosition.getY();
+	
+		return (x >= -ERROR_RADIO && x <= ERROR_RADIO) && (y >= -ERROR_RADIO && y <= ERROR_RADIO);
 	}
 	
 	// Se considera similar si esta en un radio de 10 px 
@@ -54,7 +58,7 @@ public class Target {
 		int x = this.x - otherPosition.getX();
 		int y = this.y - otherPosition.getY();
 		
-		return (x >= -RADIO || x <= RADIO) && (y >= -RADIO || y <= RADIO);
+		return (x >= -RADIO && x <= RADIO) && (y >= -RADIO && y <= RADIO);
 	}
 	
 }
