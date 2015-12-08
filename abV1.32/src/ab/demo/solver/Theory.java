@@ -74,8 +74,15 @@ public class Theory {
 	}
 
 	public void use(Vision vision, ClientNaiveAgent client) {
-		this.action = new Action();
-		this.action.initAction(beginState, vision, client);
+		if (this.action != null){
+			System.out.println("Accion conocida");
+			this.action.convert();
+		}
+		else{
+			System.out.println("Accion Nueva");
+			this.action = new Action();
+			this.action.initAction(beginState, vision, client);
+		}
 		this.action.exec(beginState, vision, client);
 	}
 

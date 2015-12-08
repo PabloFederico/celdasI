@@ -1,5 +1,7 @@
 package ab.demo.solver;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import ab.demo.ClientNaiveAgent;
@@ -10,12 +12,23 @@ import ab.vision.Vision;
 public class State {
 
 	//TODO eliminate pigs
-	//private List<ABObject> pigs;
+	private List<ABObject> pigs;
+	private List<Target> pigsPosition = new ArrayList<Target>();
+
+
 	Integer pigsQuantity = 0;
 
 	private GameState state;
 
 	public State() {}
+	
+	public List<Target> getPigsPosition() {
+		return pigsPosition;
+	}
+
+	public void setPigsPosition(List<Target> pigsPosition) {
+		this.pigsPosition = pigsPosition;
+	}
 	
 	public GameState getState() {
 		return state;
@@ -32,7 +45,12 @@ public class State {
 	}
 	
 	private void disassembleVision(Vision vision, ClientNaiveAgent clientNaiveAgent){
-		setPigsQuantity(vision.findPigsMBR().size());
+		this.pigs = vision.findPigsMBR();
+		for (ABObject pig : pigs) {
+			Target position = new Target(pig.getCenter());
+			pigsPosition.add(position);
+		}
+		setPigsQuantity(pigs.size());
 		state = clientNaiveAgent.ar.checkState();
 	}
 	
@@ -62,8 +80,17 @@ public class State {
 		if (getClass() != obj.getClass())
 			return false;
 		State other = (State) obj;
-		
-		return this.pigsQuantity == other.getPigsQuantity();
+		boolean equalsQuantity = (this.pigsQuantity == other.getPigsQuantity());
+		if (!equalsQuantity)
+			return false;
+		int i = 0;
+		for (Target pigPosition : pigsPosition) {
+			Target otherPosition = other.getPigsPosition().get(i);
+			if (! pigPosition.equals(otherPosition))
+				return false;
+			i++;
+		}
+		return true;
 	}
 
 	public boolean isEqual(State beginState) {
@@ -79,7 +106,16 @@ public class State {
 
 
 	public boolean isSimilar(State beginState) {
-		return this.pigsQuantity <= beginState.getPigsQuantity();
+		if (this.pigsQuantity != beginState.getPigsQuantity())
+			return false;
+		int i = 0;
+		for (Target pigPosition : pigsPosition) {
+			Target otherPosition = beginState.getPigsPosition().get(i);
+			if (! pigPosition.isSimilar(otherPosition))
+				return false;
+			i++;
+		}			
+		return true;
 	}
 
 }

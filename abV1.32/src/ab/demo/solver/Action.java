@@ -20,8 +20,8 @@ public class Action {
 	private int tapTime; //[1 - (0, 60 %) ]
 	private Point target;
 	private Target serializableTarget;
-	private ArrayList<Point> trajectory;
-	private ArrayList<Target> serializableTrajectory;
+	private ArrayList<Point> trajectory = new ArrayList<Point>();
+	private ArrayList<Target> serializableTrajectory = new ArrayList<Target>();
 	public ArrayList<Target> getSerializableTrajectory() {
 		return serializableTrajectory;
 	}
@@ -61,6 +61,7 @@ public class Action {
 	
 
 	public void getDefaultTapTime(State state, Vision vision, ClientNaiveAgent clientNaiveAgent, Point target, Point releasePoint){
+		System.out.println("-------------------getDefaultTapTime----------------");
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		Rectangle sling = vision.findSlingshotMBR();//state.getVision().findSlingshotMBR();
 		
@@ -98,7 +99,7 @@ public class Action {
 	}
 	
 	public void getDefaultTrajectory(State state, Vision vision, ClientNaiveAgent clientNaiveAgent, Point target){
-		
+		System.out.println("-------------------getDefaultTrajectory----------------");
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		Rectangle sling = vision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();
 		this.trajectory = null;
@@ -112,10 +113,13 @@ public class Action {
 	}
 	
 	private void getReleasePoint (State state, Vision vision, ClientNaiveAgent clientNaiveAgent, ArrayList<Point> pts) {
-		
+		System.out.println("-------------------getReleasePoint----------------");
 		this.releasePoint = null;
-		if (pts == null)
+		if (pts == null){
+			System.out.println("-------------------Not trajetory----------------");
 			return;
+		}
+			
 		// do a high shot when entering a level to find an accurate velocity
 		if (clientNaiveAgent.firstShot && pts.size() > 1) {
 			releasePoint = pts.get(1);
@@ -140,6 +144,7 @@ public class Action {
 	
 	
 	public void getDefaultTarget(State state, Vision vision, ClientNaiveAgent clientNaiveAgent){
+		System.out.println("-------------------getDefaultTarget----------------");
 		Point target = null;
 		
 		this.target = null;
@@ -175,8 +180,15 @@ public class Action {
 		getReleasePoint(state, oldVision, clientNaiveAgent, trajectory);
 		
 		getDefaultTapTime(state, oldVision, clientNaiveAgent, target, releasePoint);
+		
 		this.serializableTarget = new Target(target);
 		this.serializableReleasePoint = new Target(releasePoint);
+		if (trajectory != null){
+			for (Point pt : trajectory) {
+				this.serializableTrajectory.add(new Target(pt));
+			}
+		}
+		
 
 	}
 	
@@ -184,10 +196,6 @@ public class Action {
 		
 		Rectangle sling = oldVision.findSlingshotMBR();
 		Point refPoint  = clientNaiveAgent.tp.getReferencePoint(sling);
-		
-		
-		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
-		//Rectangle sling = oldVision.findSlingshotMBR(); //state.getVision().findSlingshotMBR();
 		
 		// check whether the slingshot is changed. the change of the slingshot indicates a change in the scale.
 		clientNaiveAgent.ar.fullyZoomOut();
@@ -245,13 +253,22 @@ public class Action {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public void convert() {
+		this.target = new Point();
+		this.target.x = this.serializableTarget.getX();
+		this.target.y = this.serializableTarget.getY();
+		
+		for (Target tg : this.serializableTrajectory) {
+			Point p = new Point();
+			p.x = tg.getX();
+			p.y = tg.getY();
+			this.trajectory.add(p);
+		}
+		this.releasePoint.x = this.serializableReleasePoint.getX();
+		this.releasePoint.y = this.serializableReleasePoint.getY();
+	}
 	
-	/*@Override
-	public String toString() {
-		return "Action [target="+this.target+", trajectory="+this.trajectory+
-				", tapTime="+this.tapTime+", releasePoint="+this.releasePoint+
-				", refPoint="+this.refPoint+"]";
-	}*/
 
 }
 

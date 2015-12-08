@@ -85,8 +85,9 @@ public class AutonomousSolver extends Solver{
 							theory = t;
 						}	
 					}
-					theory.incUses();	
+						
 					theory.use(vision, client);
+					theory.incUses();
 					teoriasUsadas++;
 				}else{ 
 					//Ponderamos y agregamos la teoria local
