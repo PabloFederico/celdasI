@@ -15,10 +15,19 @@ public class Theory {
 	private int successNumber;
 	private int useNumber;
 	private int score = 0;
+	private Double Scoring = 0.0;
 	
 	public Theory() {
 		successNumber = 0;
 		setUseNumber(0);
+	}
+
+	public Double getScoring() {
+		return Scoring;
+	}
+
+	public void setScoring(Double scoring) {
+		Scoring = scoring;
 	}
 
 	public static List<Theory> getEquals(Theory toCompare, Set<Theory> persistenTheories){
@@ -81,7 +90,7 @@ public class Theory {
 		else{
 			System.out.println("Accion Nueva");
 			this.action = new Action();
-			this.action.initAction(beginState, vision, client);
+			endState = this.action.initAction(beginState, vision, client);
 		}
 		this.action.exec(beginState, vision, client);
 		this.score = client.getCurrentScore();
@@ -157,6 +166,19 @@ public class Theory {
 
 	public void setScore(int score) {
 		this.score = score;
+	}
+
+	public boolean compareEndState(State endState2) {
+		if (endState.compare(endState2)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void score(State finalState) {
+		Float pigSuccess = (float) (beginState.getPigsQuantity() - finalState.getPigsQuantity())*100;
+		Scoring = (Scoring + pigSuccess)/2;
 	}
 
 }

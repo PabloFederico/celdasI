@@ -19,10 +19,15 @@ public class Action {
 	//private ArrayList<Point> trajectory;
 	private int tapTime; //[1 - (0, 60 %) ]
 	private Point target;
+	private TargetType targetType;
 	private Target serializableTarget;
 	private int variateTarget = 5;
 	private ArrayList<Point> trajectory = new ArrayList<Point>();
 	private ArrayList<Target> serializableTrajectory = new ArrayList<Target>();
+	
+	private enum TargetType {
+		PIG
+	}
 	
 	public Action(){}
 	
@@ -147,6 +152,7 @@ public class Action {
 		Point target = null;
 		
 		this.target = null;
+		
 		List<ABObject> pigs = vision.findPigsMBR();
 		//ClientNaiveAgent clientNaiveAgent = state.getClientNaiveAgent();
 		ABObject pig = null;
@@ -171,9 +177,15 @@ public class Action {
 		this.target = target;
 	}
 	
-	public void initAction(State state, Vision oldVision, ClientNaiveAgent clientNaiveAgent){
+	private void selectTarget() {
+		targetType = TargetType.PIG;
+		
+	}
+
+	public State initAction(State state, Vision oldVision, ClientNaiveAgent clientNaiveAgent){
 		Rectangle sling = oldVision.findSlingshotMBR();
 		
+		selectTarget();
 		getDefaultTarget(state, oldVision, clientNaiveAgent);
 		getDefaultTrajectory(state, oldVision, clientNaiveAgent, target);
 		getReleasePoint(state, oldVision, clientNaiveAgent, trajectory);
@@ -187,10 +199,20 @@ public class Action {
 				this.serializableTrajectory.add(new Target(pt));
 			}
 		}
-		
+		return determineConsequences (state, oldVision, clientNaiveAgent);
 
 	}
 	
+	private State determineConsequences(State state, Vision vision, ClientNaiveAgent clientNaiveAgent) {
+		
+		State endState = new State(vision, clientNaiveAgent);
+		//Check action
+		if (endState.getPigsQuantity()-1 >= 0) {
+			endState.setPigsQuantity(endState.getPigsQuantity()-1);
+		}
+		return endState;
+	}
+
 	public GameState defaultAction(State state, Vision oldVision, ClientNaiveAgent clientNaiveAgent){
 		
 		Rectangle sling = oldVision.findSlingshotMBR();

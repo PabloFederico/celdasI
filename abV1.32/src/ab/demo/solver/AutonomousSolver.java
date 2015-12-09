@@ -64,7 +64,8 @@ public class AutonomousSolver extends Solver{
 				System.out.println("Hay teorias iguales");
 				float maxRange = -1;
 				for (Theory t : teoriesEquals) { 
-					float range = ((1+t.getSuccessNumber()) /  t.getUseNumber());
+					//float range = ((1+t.getSuccessNumber()) /  t.getUseNumber());
+					float range = t.getScoring().floatValue();
 					if (range > maxRange){
 						maxRange = range;
 						theory = t;
@@ -80,7 +81,8 @@ public class AutonomousSolver extends Solver{
 					System.out.println("Hay teorias similares");
 					float maxRange = -1;
 					for (Theory t : teoriesSimilar) { 
-						float range = ((1+t.getSuccessNumber()) /  t.getUseNumber());
+						//float range = ((1+t.getSuccessNumber()) /  t.getUseNumber());
+						float range = t.getScoring().floatValue();
 						if (range > maxRange){
 							maxRange = range;
 							theory = t;
@@ -106,11 +108,15 @@ public class AutonomousSolver extends Solver{
 			}
 			State endState = sensor.checkEnviroment();
 			
-			if (endState.pigsQuantity < this.state.pigsQuantity){
+			if (theory.compareEndState(endState)) {
 				theory.incrementSucces();
+			} else {
+				//Changes the end state
+				theory.addEndState(endState);
 			}
+			theory.score(endState);
 			
-			theory.addEndState(endState);
+			//theory.addEndState(endState);
 			System.out.println("Teorias Usadas: " + teoriasUsadas);
 			System.out.println("Teorias En Memorias: " + theories.size());
 		} catch (IOException e) {

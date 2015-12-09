@@ -120,4 +120,13 @@ public class State {
 		return true;
 	}
 
+	public State copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean compare(State endState2) {
+		return this.pigsQuantity.intValue() >= endState2.getPigsQuantity().intValue();
+	}
+
 }
