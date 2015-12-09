@@ -84,7 +84,7 @@ public class Theory {
 			this.action.initAction(beginState, vision, client);
 		}
 		this.action.exec(beginState, vision, client);
-		this.score = client.checkMyScore(client.currentLevel);
+		this.score = client.getCurrentScore();
 		System.out.println("Score : " + score);
 	}
 

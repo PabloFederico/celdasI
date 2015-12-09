@@ -64,7 +64,7 @@ public class AutonomousSolver extends Solver{
 				System.out.println("Hay teorias iguales");
 				float maxRange = -1;
 				for (Theory t : teoriesEquals) { 
-					float range = t.getSuccessNumber() /  t.getUseNumber();
+					float range = ((1+t.getSuccessNumber()) /  t.getUseNumber());
 					if (range > maxRange){
 						maxRange = range;
 						theory = t;
@@ -80,7 +80,7 @@ public class AutonomousSolver extends Solver{
 					System.out.println("Hay teorias similares");
 					float maxRange = -1;
 					for (Theory t : teoriesSimilar) { 
-						float range = t.getSuccessNumber() /  t.getUseNumber();
+						float range = ((1+t.getSuccessNumber()) /  t.getUseNumber());
 						if (range > maxRange){
 							maxRange = range;
 							theory = t;
@@ -95,13 +95,13 @@ public class AutonomousSolver extends Solver{
 					//Ponderamos y agregamos la teoria local
 					if(!this.theories.contains(theory)){
 						System.out.println("Not Contains theory");
-						this.theories.add(theory);	
+						this.theories.add(theory);
+						theory.incUses();
+						theory.use(vision, client);
+						teoriasUsadas++;
 					}else{
-						System.out.println("theory usasada");
+						System.out.println("theory usada");
 					}
-					theory.incUses();
-					theory.use(vision, client);
-					teoriasUsadas++;
 				}	
 			}
 			State endState = sensor.checkEnviroment();

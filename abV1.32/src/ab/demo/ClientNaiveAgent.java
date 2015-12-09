@@ -111,6 +111,18 @@ public class ClientNaiveAgent implements Runnable {
     /* 
      * Run the Client (Naive Agent)
      */
+	public int getCurrentScore() {
+		
+		int[] scores = ar.checkMyScore();
+		checkMyScore();
+		if (currentLevel > 0) {
+			return scores [currentLevel-1];
+		} else {
+			return 0;
+		}
+	}
+	
+	
 	private void checkMyScore()
 	{
 		
